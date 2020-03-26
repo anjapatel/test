@@ -1,34 +1,34 @@
-var express = require("express");
-var webpack = require("webpack");
-var merge = require("lodash/merge");
-var config = merge({}, require("./webpack.docs.config"));
+// server.js
+// where your node app starts
 
-config.devtool = "cheap-module-eval-source-map";
-config.entry.unshift("webpack-hot-middleware/client");
-config.plugins.push(
-  new webpack.HotModuleReplacementPlugin(),
-  new webpack.NoErrorsPlugin()
-);
+// we've started you off with Express (https://expressjs.com/)
+// but feel free to use whatever libraries or frameworks you'd like through `package.json`.
+const express = require("express");
+const app = express();
 
-var app = express();
-var compiler = webpack(config);
+// our default array of dreams
+const dreams = [
+  "Find and count some sheep",
+  "Climb a really tall mountain",
+  "Wash the dishes"
+];
 
-app.use(
-  require("webpack-dev-middleware")(compiler, {
-    noInfo: true,
-    publicPath: config.output.publicPath
-  })
-);
+// make all the files in 'public' available
+// https://expressjs.com/en/starter/static-files.html
+app.use(express.static("public"));
 
-app.use(require("webpack-hot-middleware")(compiler));
+// https://expressjs.com/en/starter/basic-routing.html
+app.get("/", (request, response) => {
+  response.sendFile(__dirname + "/views/index.html");
+});
 
-app.use(express.static("docs-site"));
+// send the default array of dreams to the webpage
+app.get("/dreams", (request, response) => {
+  // express helps us take JS objects and send them as JSON
+  response.json(dreams);
+});
 
-app.listen(8080, "localhost", function(err) {
-  if (err) {
-    console.log(err);
-    return;
-  }
-
-  console.log("Listening at http://localhost:8080");
+// listen for requests :)
+const listener = app.listen(process.env.PORT, () => {
+  console.log("Your app is listening on port " + listener.address().port);
 });
